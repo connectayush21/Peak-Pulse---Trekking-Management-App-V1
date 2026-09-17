@@ -39,7 +39,7 @@ class Trek(db.Model):
     end_date = db.Column(db.Date, nullable=False)
     description = db.Column(db.Text, nullable=True)
     price = db.Column(db.Float, default=0.0)
-    image_url = db.Column(db.String(255), nullable=True)
+    image_url = db.Column(db.String(2550), nullable=True)
 
     bookings = db.relationship('Booking', backref='trek', lazy=True, cascade="all, delete-orphan")
 
