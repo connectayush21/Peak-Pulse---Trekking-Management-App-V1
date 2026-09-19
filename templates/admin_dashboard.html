@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="hero-header">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h1 class="display-5 fw-bold mb-1">Admin Control Center</h1>
+            <p class="lead mb-0 text-white-70">Monitor operations, manage treks, guides, and bookings.</p>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            <span class="badge bg-light text-dark fs-6 py-2 px-3 rounded-pill">
+                <i class="bi bi-clock me-1 text-success"></i> System Online
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    <div class="col-md-3">
+        <div class="stat-widget">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="stat-val">{{ total_treks }}</div>
+                    <div class="stat-lbl">Total Treks</div>
+                </div>
+                <div class="fs-1 text-muted"><i class="bi bi-map-fill"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-widget" style="border-left-color: #2e7d32;">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="stat-val">{{ total_users }}</div>
+                    <div class="stat-lbl">Active Trekkers</div>
+                </div>
+                <div class="fs-1 text-muted"><i class="bi bi-people-fill"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-widget" style="border-left-color: #f57c00;">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="stat-val">{{ total_staff }}</div>
+                    <div class="stat-lbl">Trek Staff</div>
+                </div>
+                <div class="fs-1 text-muted"><i class="bi bi-person-badge-fill"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-widget" style="border-left-color: #0288d1;">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="stat-val">{{ total_bookings }}</div>
+                    <div class="stat-lbl">Bookings</div>
+                </div>
+                <div class="fs-1 text-muted"><i class="bi bi-journal-bookmark-fill"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if pending_staff %}
+<div class="glass-card p-4 mb-5" style="border-top: 4px solid #f57c00;">
+    <h3 class="fw-bold mb-3 text-dark d-flex align-items-center">
+        <i class="bi bi-exclamation-octagon-fill text-warning me-2"></i>
+        Pending Guide Approvals
+        <span class="badge bg-warning text-dark ms-2">{{ pending_staff|length }}</span>
+    </h3>
+    <p class="text-muted">These trek guides self-registered and require approval before accessing their guides dashboard.</p>
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email / Username</th>
+                    <th>Contact details</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for staff in pending_staff %}
+                <tr>
+                    <td><code>#{{ staff.id }}</code></td>
+                    <td class="fw-bold">{{ staff.name }}</td>
+                    <td>{{ staff.username }}</td>
+                    <td>{{ staff.contact_details or 'N/A' }}</td>
+                    <td>
+                        <a href="{{ url_for('main.approve_staff', user_id=staff.id) }}" class="btn btn-success btn-sm rounded-pill px-3">
+                            <i class="bi bi-person-check-fill me-1"></i> Approve Guide
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+<div class="row g-4 mb-5">
+    <div class="col-lg-8">
+        <div class="glass-card p-4 h-100">
+            <h4 class="fw-bold mb-4"><i class="bi bi-bar-chart-fill me-2 text-success"></i>Popular Treks (Bookings per Route)</h4>
+            <div class="chart-container" style="position: relative; height:300px;">
+                <canvas id="trekBookingsChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="glass-card p-4 h-100">
+            <h4 class="fw-bold mb-4"><i class="bi bi-pie-chart-fill me-2 text-success"></i>Trek Difficulty Ratios</h4>
+            <div class="chart-container" style="position: relative; height:300px; display: flex; justify-content: center;">
+                <canvas id="difficultyChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="glass-card p-4 mb-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h4 class="fw-bold mb-0"><i class="bi bi-calendar2-week me-2 text-success"></i>Recent Booking Log</h4>
+        <a href="{{ url_for('main.admin_bookings') }}" class="btn btn-outline-success btn-sm rounded-pill px-3">View Full Log</a>
+    </div>
+    {% if all_bookings %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Trekker Name</th>
+                        <th>Trek Name</th>
+                        <th>Booking Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in all_bookings[:5] %}
+                    <tr>
+                        <td><code>#{{ booking.id }}</code></td>
+                        <td>
+                            <strong>{{ booking.trekker.name }}</strong><br>
+                            <small class="text-muted">{{ booking.trekker.username }}</small>
+                        </td>
+                        <td>
+                            <strong>{{ booking.trek.name }}</strong><br>
+                            <small class="text-muted"><i class="bi bi-geo-alt"></i> {{ booking.trek.location }}</small>
+                        </td>
+                        <td>{{ booking.booking_date.strftime('%d-%m-%Y %H:%M') }}</td>
+                        <td>
+                            {% if booking.status == 'Booked' %}
+                                <span class="badge badge-status badge-open">Active</span>
+                            {% elif booking.status == 'Cancelled' %}
+                                <span class="badge badge-status badge-closed">Cancelled</span>
+                            {% else %}
+                                <span class="badge badge-status badge-completed">Completed</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="text-center py-4 text-muted">
+            <i class="bi bi-inbox fs-1"></i>
+            <p class="mt-2">No bookings recorded yet in the database.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const trekLabels = {{ trek_labels|tojson }};
+    const bookingCounts = {{ trek_booking_counts|tojson }};
+    const difficultyLabels = {{ difficulty_labels|tojson }};
+    const difficultyCounts = {{ difficulty_counts|tojson }};
+
+    const barCtx = document.getElementById('trekBookingsChart').getContext('2d');
+    new Chart(barCtx, {
+        type: 'bar',
+        data: {
+            labels: trekLabels,
+            datasets: [{
+                label: 'Number of Active Bookings',
+                data: bookingCounts,
+                backgroundColor: 'rgba(31, 64, 55, 0.75)',
+                borderColor: 'rgba(31, 64, 55, 1)',
+                borderWidth: 1,
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+
+    const pieCtx = document.getElementById('difficultyChart').getContext('2d');
+    new Chart(pieCtx, {
+        type: 'doughnut',
+        data: {
+            labels: difficultyLabels,
+            datasets: [{
+                data: difficultyCounts,
+                backgroundColor: [
+                    '#a3cfbb',
+                    '#f8c471',
+                    '#ec7063'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}
