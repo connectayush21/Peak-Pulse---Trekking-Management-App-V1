@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Treks - Peak Pulse{% endblock %}
+
+{% block content %}
+<div class="row g-4 mb-4">
+    <div class="col-lg-4">
+        <div class="glass-card p-4">
+            <h3 class="fw-bold mb-3 text-dark"><i class="bi bi-plus-circle-fill text-success me-2"></i>Create New Trek</h3>
+            <p class="text-muted small">Add a new route with slots, price, schedule, and assign a trek guide.</p>
+            <hr>
+            
+            <form action="{{ url_for('main.admin_treks') }}" method="POST">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Trek Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="e.g. Nongjrong" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="location" class="form-label">Location <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="location" name="location" placeholder="e.g. Meghalaya, India" required>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <label for="difficulty" class="form-label">Difficulty <span class="text-danger">*</span></label>
+                        <select class="form-select" id="difficulty" name="difficulty" required>
+                            <option value="Easy">Easy</option>
+                            <option value="Moderate">Moderate</option>
+                            <option value="Hard">Hard</option>
+                        </select>
+                    </div>
+                    <div class="col-6">
+                        <label for="duration" class="form-label">Duration (Days) <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="duration" name="duration" min="1" placeholder="e.g. 5" required>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <label for="total_slots" class="form-label">Total Slots <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="total_slots" name="total_slots" min="1" placeholder="e.g. 20" required>
+                    </div>
+                    <div class="col-6">
+                        <label for="price" class="form-label">Price ₹ <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="price" name="price" step="1" min="0" placeholder="e.g. 150" required>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="start_date" class="form-label">Start Date <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" id="start_date" name="start_date" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="end_date" class="form-label">End Date <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" id="end_date" name="end_date" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="staff_id" class="form-label">Assign Guide (Trek Staff)</label>
+                    <select class="form-select" id="staff_id" name="staff_id">
+                        <option value="">-- No Guide Assigned --</option>
+                        {% for guide in guides %}
+                            <option value="{{ guide.id }}">{{ guide.name }} ({{ guide.username }})</option>
+                        {% endfor %}
+                    </select>
+                    <div class="form-text text-muted">Guides must be approved by the admin.</div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="description" class="form-label">Trek Description</label>
+                    <textarea class="form-control" id="description" name="description" rows="3" placeholder="Brief details about the routes, attractions, highlights..."></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label for="image_url" class="form-label">Trek Image</label>
+                    <textarea class="form-control" id="image_url" name="image_url" rows="1" placeholder="Enter image URL (optional)"></textarea>
+                </div>
+                
+                <button type="submit" class="btn btn-primary-custom w-100 py-2"><i class="bi bi-plus-circle me-1"></i> Add Trek</button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="col-lg-8">
+        <div class="glass-card p-4">
+            <h3 class="fw-bold mb-3 text-dark"><i class="bi bi-journals text-success me-2"></i>Active Trek Routes</h3>
+            
+            <form action="{{ url_for('main.admin_treks') }}" method="GET" class="row g-2 mb-4">
+                <div class="col-sm-9">
+                    <input type="text" class="form-control" name="search" value="{{ search_query }}" placeholder="Search routes by name, location, or ID...">
+                </div>
+                <div class="col-sm-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary-custom w-100">Filter</button>
+                    {% if search_query %}
+                        <a href="{{ url_for('main.admin_treks') }}" class="btn btn-outline-secondary"><i class="bi bi-x-lg"></i></a>
+                    {% endif %}
+                </div>
+            </form>
+            
+            {% if treks %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Trek details</th>
+                                <th>Difficulty</th>
+                                <th>Assigned Guide</th>
+                                <th>Available Slots</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for trek in treks %}
+                            <tr>
+                                <td><code>#{{ trek.id }}</code></td>
+                                <td>
+                                    <strong>{{ trek.name }}</strong><br>
+                                    <small class="text-muted"><i class="bi bi-geo-alt"></i> {{ trek.location }} ({{ trek.duration }} days)</small><br>
+                                    <small class="text-secondary"><i class="bi bi-calendar-event"></i> {{ trek.start_date.strftime('%d-%m-%Y') }} to {{ trek.end_date.strftime('%d-%m-%Y') }}</small>
+                                </td>
+                                <td>
+                                    {% if trek.difficulty == 'Easy' %}
+                                        <span class="badge bg-success-subtle text-success border border-success">{{ trek.difficulty }}</span>
+                                    {% elif trek.difficulty == 'Moderate' %}
+                                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning">{{ trek.difficulty }}</span>
+                                    {% else %}
+                                        <span class="badge bg-danger-subtle text-danger border border-danger">{{ trek.difficulty }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if trek.guide %}
+                                        <span class="fw-medium"><i class="bi bi-person-badge"></i> {{ trek.guide.name }}</span>
+                                    {% else %}
+                                        <span class="text-danger small"><i class="bi bi-exclamation-triangle"></i> Unassigned</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <strong class="text-success">{{ trek.available_slots }}</strong> / {{ trek.total_slots }}
+                                </td>
+                                <td>
+                                    {% if trek.status == 'Open' %}
+                                        <span class="badge badge-status badge-open">Open</span>
+                                    {% elif trek.status == 'Approved' %}
+                                        <span class="badge badge-status badge-approved">Approved</span>
+                                    {% elif trek.status == 'Pending' %}
+                                        <span class="badge badge-status badge-pending">Pending</span>
+                                    {% elif trek.status == 'Closed' %}
+                                        <span class="badge badge-status badge-closed">Closed</span>
+                                    {% else %}
+                                        <span class="badge badge-status badge-completed">Completed</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{{ url_for('main.admin_edit_trek', trek_id=trek.id) }}" class="btn btn-outline-primary" title="Edit">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                        <a href="{{ url_for('main.admin_delete_trek', trek_id=trek.id) }}" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this trek?');" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-inbox fs-1"></i>
+                    <p class="mt-2 mb-0">No treks found.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
