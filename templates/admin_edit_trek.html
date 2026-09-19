@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Trek - Peak Pulse{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="glass-card p-5">
+            <div class="d-flex align-items-center mb-4">
+                <a href="{{ url_for('main.admin_treks') }}" class="btn btn-outline-secondary btn-sm rounded-pill me-3 px-3">
+                    <i class="bi bi-arrow-left"></i> Back
+                </a>
+                <h2 class="fw-bold mb-0">Edit Trek details</h2>
+            </div>
+            <hr class="mb-4">
+            
+            <form action="{{ url_for('main.admin_edit_trek', trek_id=trek.id) }}" method="POST">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Trek Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="name" name="name" value="{{ trek.name }}" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="location" class="form-label">Location <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="location" name="location" value="{{ trek.location }}" required>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label for="difficulty" class="form-label">Difficulty <span class="text-danger">*</span></label>
+                        <select class="form-select" id="difficulty" name="difficulty" required>
+                            <option value="Easy" {% if trek.difficulty == 'Easy' %}selected{% endif %}>Easy</option>
+                            <option value="Moderate" {% if trek.difficulty == 'Moderate' %}selected{% endif %}>Moderate</option>
+                            <option value="Hard" {% if trek.difficulty == 'Hard' %}selected{% endif %}>Hard</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="duration" class="form-label">Duration (Days) <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="duration" name="duration" min="1" value="{{ trek.duration }}" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="price" class="form-label">Price ₹ <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="price" name="price" step="1" min="0" value="{{ trek.price }}" required>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="total_slots" class="form-label">Total Slots <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="total_slots" name="total_slots" min="1" value="{{ trek.total_slots }}" required>
+                        <div class="form-text">Currently Booked: <strong>{{ trek.total_slots - trek.available_slots }}</strong> slots.</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="staff_id" class="form-label">Assigned Guide</label>
+                        <select class="form-select" id="staff_id" name="staff_id">
+                            <option value="">-- No Guide Assigned --</option>
+                            {% for guide in guides %}
+                                <option value="{{ guide.id }}" {% if trek.staff_id == guide.id %}selected{% endif %}>{{ guide.name }} ({{ guide.username }})</option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text">Only approved guides are available.</div>
+                    </div>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label for="start_date" class="form-label">Start Date <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" id="start_date" name="start_date" value="{{ trek.start_date.isoformat() }}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="end_date" class="form-label">End Date <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" id="end_date" name="end_date" value="{{ trek.end_date.isoformat() }}" required>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea class="form-control" id="description" name="description" rows="4">{{ trek.description }}</textarea>
+                </div>
+                
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary-custom flex-grow-1"><i class="bi bi-save me-1"></i> Save Changes</button>
+                    <a href="{{ url_for('main.admin_treks') }}" class="btn btn-outline-secondary px-4">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
