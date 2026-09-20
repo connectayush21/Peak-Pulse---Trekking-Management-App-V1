@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Users & Staff - Peak Pulse{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4">
+    <div>
+        <h2 class="fw-bold"><i class="bi bi-people-fill text-success me-2"></i>Manage Users & Staff</h2>
+        <p class="text-muted mb-0">View profiles, verify registration statuses, and manage access privileges.</p>
+    </div>
+</div>
+
+<div class="glass-card p-4 mb-4">
+    <form action="{{ url_for('main.admin_users') }}" method="GET" class="row g-3">
+        <div class="col-md-9">
+            <div class="input-group">
+                <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control" name="search" value="{{ search_query }}" placeholder="Search users by name, email, or exact ID...">
+            </div>
+        </div>
+        <div class="col-md-3 d-flex gap-2">
+            <button type="submit" class="btn btn-primary-custom w-100">Search</button>
+            {% if search_query %}
+                <a href="{{ url_for('main.admin_users') }}" class="btn btn-outline-secondary"><i class="bi bi-x-lg"></i></a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<div class="glass-card p-4">
+    {% if users %}
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>User ID</th>
+                    <th>Full Name</th>
+                    <th>Email / Username</th>
+                    <th>Role</th>
+                    <th>Contact Details</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td><code>#{{ user.id }}</code></td>
+                    <td class="fw-bold">{{ user.name }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>
+                        {% if user.role == 'admin' %}
+                            <span class="badge bg-dark">Admin</span>
+                        {% elif user.role == 'staff' %}
+                            <span class="badge bg-info text-dark">Staff Guide</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Trekker</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ user.contact_details or 'N/A' }}</td>
+                    <td>
+                        {% if user.status == 'blacklisted' %}
+                            <span class="badge badge-status badge-closed"><i class="bi bi-slash-circle me-1"></i> Blacklisted</span>
+                        {% elif user.status == 'pending' %}
+                            <span class="badge badge-status badge-pending"><i class="bi bi-hourglass me-1"></i> Pending Approval</span>
+                        {% else %}
+                            <span class="badge badge-status badge-open"><i class="bi bi-check-circle me-1"></i> Active</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if user.role != 'admin' %}
+                            <a href="{{ url_for('main.toggle_user_status', user_id=user.id) }}" 
+                               class="btn {% if user.status == 'blacklisted' %}btn-success{% else %}btn-danger-custom{% endif %} btn-sm rounded-pill px-3">
+                                {% if user.status == 'blacklisted' %}
+                                    <i class="bi bi-shield-check me-1"></i> Activate
+                                {% else %}
+                                    <i class="bi bi-shield-x me-1"></i> Blacklist
+                                {% endif %}
+                            </a>
+                        {% else %}
+                            <span class="text-muted small">Protected User</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-center py-5 text-muted">
+        <i class="bi bi-people fs-1 text-muted mb-2"></i>
+        <p class="mb-0">No users found matching your search criteria.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
