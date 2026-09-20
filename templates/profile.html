@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Profile - Peak Pulse{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="glass-card p-5 my-4">
+            <div class="text-center mb-4">
+                <i class="bi bi-person-gear text-success" style="font-size: 3rem;"></i>
+                <h2 class="fw-bold mt-2">Manage Your Profile</h2>
+                <p class="text-muted">Update your details and account security</p>
+            </div>
+            
+            <form action="{{ url_for('main.edit_profile') }}" method="POST">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
+                        <input type="text" class="form-control" id="name" name="name" value="{{ current_user.name }}" required>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="username" class="form-label">Email Address (Username)</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="bi bi-envelope"></i></span>
+                        <input type="email" class="form-control" id="username" value="{{ current_user.username }}" readonly disabled>
+                    </div>
+                    <div class="form-text text-muted">Email address cannot be changed.</div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="contact" class="form-label">Contact Details</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="bi bi-phone"></i></span>
+                        <input type="text" class="form-control" id="contact" name="contact" value="{{ current_user.contact_details or '' }}" placeholder="+1234567890">
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="password" class="form-label">New Password (Leave blank to keep current)</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="bi bi-lock"></i></span>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="••••••••" minlength="6">
+                    </div>
+                    <div class="form-text">Must be at least 6 characters if changed.</div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary-custom w-100 py-3 mb-2">
+                    <i class="bi bi-save me-1"></i> Save Changes
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
