@@ -17,12 +17,10 @@ The app is structured around a role-based dashboard system, with a clean fronten
 ## Site Preview 
 
 1. Admin Dashboard 
-<img width="1314" height="1706" alt="Screenshot_21-9-2026_3542_127 0 0 1" src="https://github.com/user-attachments/assets/83dc763e-2e97-4b0f-a24d-61c6a892d450" />
-
+<img width="2628" height="3412" alt="Screenshot_21-9-2026_3542_127 0 0 1" src="https://github.com/user-attachments/assets/bf3c4d0f-b2f9-4dec-bbde-7fdd40783dc1" />
 
 2. Admin Trek Manager
-
-
+<img width="2628" height="2550" alt="Screenshot_21-9-2026_360_127 0 0 1" src="https://github.com/user-attachments/assets/3e368b06-d471-43b1-9127-8930974b8b35" >
 
 3. Staff(Guide) Dashboard
 <img width="2628" height="1565" alt="Screenshot_21-9-2026_328_127 0 0 1" src="https://github.com/user-attachments/assets/f90ed3a7-ab6d-43f1-9801-fe4d4f621c3a" />
