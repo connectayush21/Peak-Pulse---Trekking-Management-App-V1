@@ -49,7 +49,7 @@ The app is structured around a role-based dashboard system, with a clean fronten
 - Jinja2 Templates
 
 ## Project Structure
-
+'''
 Peak-Pulse---Trekking-Management-App-V1/
 ├── app.py
 ├── routes.py
@@ -74,7 +74,7 @@ Peak-Pulse---Trekking-Management-App-V1/
 │   ├── user_dashboard.html
 │   └── view_trek.html
 └── README.md
-
+'''
 ## Roles in the App
 
 ### Trekkers
