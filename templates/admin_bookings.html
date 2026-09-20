@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Bookings Log - Peak Pulse{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4">
+    <div>
+        <h2 class="fw-bold"><i class="bi bi-journal-check text-success me-2"></i>Global Bookings Log</h2>
+        <p class="text-muted mb-0">Monitor all trekking registration records, cancellations, and participant statuses.</p>
+    </div>
+</div>
+
+<div class="glass-card p-4">
+    {% if bookings %}
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Booking ID</th>
+                    <th>Trekker / Account</th>
+                    <th>Trek Route Details</th>
+                    <th>Date Booked</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                <tr>
+                    <td><code>#{{ booking.id }}</code></td>
+                    <td>
+                        <strong>{{ booking.trekker.name }}</strong><br>
+                        <small class="text-muted"><i class="bi bi-envelope"></i> {{ booking.trekker.username }}</small><br>
+                        <small class="text-secondary"><i class="bi bi-phone"></i> {{ booking.trekker.contact_details or 'No Contact' }}</small>
+                    </td>
+                    <td>
+                        <strong>{{ booking.trek.name }}</strong><br>
+                        <small class="text-muted"><i class="bi bi-geo-alt"></i> {{ booking.trek.location }}</small><br>
+                        <small class="text-secondary"><i class="bi bi-calendar3"></i> {{ booking.trek.start_date.strftime('%d-%m-%Y') }} to {{ booking.trek.end_date.strftime('%d-%m-%Y') }}</small>
+                    </td>
+                    <td>{{ booking.booking_date.strftime('%d-%m-%Y %H:%M') }}</td>
+                    <td>
+                        {% if booking.status == 'Booked' %}
+                            <span class="badge badge-status badge-open">Booked</span>
+                        {% elif booking.status == 'Cancelled' %}
+                            <span class="badge badge-status badge-closed">Cancelled</span>
+                        {% else %}
+                            <span class="badge badge-status badge-completed">Completed</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if booking.status == 'Booked' %}
+                            <form action="{{ url_for('main.cancel_booking', booking_id=booking.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this booking? This will restore 1 available slot to the trek.');">
+                                <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                                    <i class="bi bi-x-circle me-1"></i> Cancel Booking
+                                </button>
+                            </form>
+                        {% else %}
+                            <span class="text-muted small">No actions</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-center py-5 text-muted">
+        <i class="bi bi-journal-x fs-1 mb-2"></i>
+        <p class="mb-0">No booking records found.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
