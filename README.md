@@ -100,20 +100,10 @@ Admins can:
 
 ## Database Model / ER Diagram
 
+<img width="1046" height="966" alt="image" src="https://github.com/user-attachments/assets/4878e49c-dd70-4b66-a8a5-d0a6e93bae0d" />
 
 
 ## Main Website Sections
 
-The app is designed around these core sections:
 
-1. Landing / Login Flow
-2. User Dashboard
-3. Trek Listing and Search
-4. Trek Details Page
-5. Booking and Cancellation Flow
-6. Staff Dashboard
-7. Admin Dashboard
-8. User Management
-9. Trek Management
-10. Booking Logs and Reporting
 
