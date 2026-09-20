@@ -14,6 +14,16 @@ This project provides a complete workflow for a trekking company:
 
 The app is structured around a role-based dashboard system, with a clean frontend built with Flask templates and Bootstrap styling.
 
+## Site Preview 
+
+1. Admin Dashboard 
+
+2. Admin Trek Manager
+
+3. User Dashboard 
+
+4. User Booking 
+
 ## Key Features
 
 ### User Side
@@ -101,9 +111,4 @@ Admins can:
 ## Database Model / ER Diagram
 
 <img width="2520" height="1368" alt="Blank diagram - Page 1" src="https://github.com/user-attachments/assets/3f029f97-13f6-4137-894d-c5d520184e4c" />
-
-
-## Main Website Sections
-
-
 
