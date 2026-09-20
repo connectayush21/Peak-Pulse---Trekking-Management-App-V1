@@ -100,7 +100,7 @@ Admins can:
 
 ## Database Model / ER Diagram
 
-<img width="2481" height="1299" alt="Blank diagram - Page 1" src="https://github.com/user-attachments/assets/f65b8470-d491-4d6f-9800-19c1abb2d53c" />
+<img width="2520" height="1368" alt="Blank diagram - Page 1" src="https://github.com/user-attachments/assets/3f029f97-13f6-4137-894d-c5d520184e4c" />
 
 
 ## Main Website Sections
