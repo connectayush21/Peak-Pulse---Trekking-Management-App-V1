@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}{{ trek.name }} - Peak Pulse{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="d-flex align-items-center mb-4">
+            <a href="javascript:history.back()" class="btn btn-outline-secondary btn-sm rounded-pill px-3 me-3">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
+            <h2 class="fw-bold mb-0">Trek Exploration</h2>
+        </div>
+        
+        <div class="glass-card overflow-hidden mb-4">
+            <div style="height: 350px; background-image: url('{{ trek.image_url or 'https://wallpaperaccess.com/full/6170749.jpg' }}'); background-size: cover; background-position: center; position: relative;">
+                <div class="position-absolute top-0 start-0 m-4 d-flex gap-2">
+                    <span class="badge {% if trek.difficulty == 'Easy' %}bg-success{% elif trek.difficulty == 'Moderate' %}bg-warning text-dark{% else %}bg-danger{% endif %} fs-6 px-3 py-2 rounded-pill">
+                        {{ trek.difficulty }} Route
+                    </span>
+                    <span class="badge bg-dark fs-6 px-3 py-2 rounded-pill">
+                        Status: {{ trek.status }}
+                    </span>
+                </div>
+            </div>
+            
+            <div class="p-5">
+                <div class="row g-4">
+                    <div class="col-md-8">
+                        <h1 class="fw-bold text-dark mb-2">{{ trek.name }}</h1>
+                        <p class="text-muted fs-5"><i class="bi bi-geo-alt-fill text-success"></i> {{ trek.location }}</p>
+                        
+                        <h4 class="fw-bold text-dark mt-4 mb-3">Trek Itinerary & Highlights</h4>
+                        <p class="text-secondary" style="line-height: 1.7;">
+                            {{ trek.description or 'Experience the breathtaking trails, scenic mountain valley landscapes, and local cultures of ' ~ trek.location ~ '. This trip is guided by professional guides with complete safety logistics. All meals, camp setups, and guiding equipment are covered in the registration package.' }}
+                        </p>
+                        
+                        <div class="alert alert-success d-flex align-items-center mt-4 rounded-4" role="alert">
+                            <i class="bi bi-shield-check-fill fs-4 me-3 text-success"></i>
+                            <div>
+                                <strong>Safety Guidelines Included:</strong> Pre-trek medical checkups, oxygen setups, and satellite backup communication are managed by the expedition guides.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="p-4 bg-light rounded-4 border">
+                            <div class="text-center mb-4">
+                                <span class="text-muted small uppercase">Expedition Fee</span>
+                                <h2 class="fw-bold text-success mb-0"> ₹{{ trek.price }}</h2>
+                                <span class="text-secondary small">Per participant</span>
+                            </div>
+                            <hr class="my-3">
+                            
+                            <div class="mb-3">
+                                <span class="text-secondary small d-block">Trail Guide</span>
+                                <strong>
+                                    {% if trek.guide %}
+                                        <i class="bi bi-person-badge text-success me-1"></i> {{ trek.guide.name }}
+                                    {% else %}
+                                        <i class="bi bi-exclamation-triangle text-danger me-1"></i> Unassigned
+                                    {% endif %}
+                                </strong>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <span class="text-secondary small d-block">Duration</span>
+                                <strong><i class="bi bi-clock-fill text-success me-1"></i> {{ trek.duration }} Days</strong>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <span class="text-secondary small d-block">Schedule</span>
+                                <strong><i class="bi bi-calendar3 text-success me-1"></i> {{ trek.start_date.strftime('%d-%m-%Y') }} to {{ trek.end_date.strftime('%d-%m-%Y') }}</strong>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <span class="text-secondary small d-block">Slots Available</span>
+                                <strong class="fs-5 {% if trek.available_slots > 0 %}text-success{% else %}text-danger{% endif %}">
+                                    <i class="bi bi-people-fill me-1"></i> {{ trek.available_slots }} / {{ trek.total_slots }} Slots left
+                                </strong>
+                            </div>
+                            
+                            {% if current_user.role == 'trekker' %}
+                                {% if already_booked %}
+                                    <div class="alert alert-info text-center rounded-3 fw-bold mb-0">
+                                        <i class="bi bi-check2-circle me-1"></i> You Have Booked This Trek
+                                    </div>
+                                {% elif trek.status != 'Open' %}
+                                    <button class="btn btn-secondary w-100 py-3 disabled" disabled>
+                                        <i class="bi bi-slash-circle me-1"></i> Booking Closed
+                                    </button>
+                                {% elif trek.available_slots <= 0 %}
+                                    <button class="btn btn-secondary w-100 py-3 disabled" disabled>
+                                        <i class="bi bi-exclamation-triangle me-1"></i> Fully Booked
+                                    </button>
+                                {% else %}
+                                    <form action="{{ url_for('main.book_trek', trek_id=trek.id) }}" method="POST">
+                                        <button type="submit" class="btn btn-primary-custom w-100 py-3">
+                                            <i class="bi bi-bookmark-plus-fill me-1"></i> Book Trek Now
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            {% else %}
+                                <div class="alert alert-secondary text-center rounded-3 mb-0 small">
+                                    <i class="bi bi-info-circle me-1"></i> Log in as Trekker to book this expedition.
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
