@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Register - Peak Pulse{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="col-md-6 col-lg-5">
+        <div class="glass-card p-5 my-4">
+            <div class="text-center mb-4">
+                <i class="bi bi-person-plus text-success" style="font-size: 3rem;"></i>
+                <h2 class="fw-bold mt-2">Create an Account</h2>
+                <p class="text-muted">Register to join or lead treks</p>
+            </div>
+            
+            <form action="{{ url_for('main.register') }}" method="POST">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
+                        <input type="text" class="form-control" id="name" name="name" placeholder="Full Name" required>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="username" class="form-label">Email Address (Username) <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="bi bi-envelope"></i></span>
+                        <input type="email" class="form-control" id="username" name="username" placeholder="john@example.com" required>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="contact" class="form-label">Contact Details</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="bi bi-phone"></i></span>
+                        <input type="text" class="form-control" id="contact" name="contact" placeholder="+1234567890">
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="role" class="form-label">Register As <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="bi bi-shield-check"></i></span>
+                        <select class="form-select" id="role" name="role" required>
+                            <option value="" disabled selected>Select your role...</option>
+                            <option value="trekker">User (Trekker) - Book and join treks</option>
+                            <option value="staff">Trek Staff (Guide) - Guide and manage treks</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="bi bi-lock"></i></span>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="••••••••" required minlength="6">
+                    </div>
+                    <div class="form-text">Must be at least 6 characters.</div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary-custom w-100 py-3 mb-3">
+                    <i class="bi bi-check-circle me-2"></i>Register
+                </button>
+            </form>
+            
+            <div class="text-center mt-2">
+                <p class="mb-0 text-muted">Already registered? <a href="{{ url_for('main.login') }}" class="text-success fw-bold">Log In</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
