@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Trek Participants - Peak Pulse{% endblock %}
+
+{% block content %}
+<div class="glass-card p-5">
+    <div class="d-flex align-items-center mb-4">
+        <a href="{{ url_for('main.staff_dashboard') }}" class="btn btn-outline-secondary btn-sm rounded-pill me-3 px-3">
+            <i class="bi bi-arrow-left"></i> Back to Dashboard
+        </a>
+        <h2 class="fw-bold mb-0">Registered Participants</h2>
+    </div>
+    
+    <div class="p-3 bg-light rounded-4 mb-4">
+        <div class="row">
+            <div class="col-md-6">
+                <span class="text-secondary small uppercase">Trek Route</span>
+                <h4 class="fw-bold text-dark mb-0">{{ trek.name }}</h4>
+            </div>
+            <div class="col-md-3">
+                <span class="text-secondary small uppercase">Schedule</span>
+                <div><strong>{{ trek.start_date.strftime('%d-%m-%Y') }}</strong> to <strong>{{ trek.end_date.strftime('%d-%m-%Y') }}</strong></div>
+            </div>
+            <div class="col-md-3">
+                <span class="text-secondary small uppercase">Trekker's Count</span>
+                <div><strong class="text-success">{{ bookings|length }}</strong> active participants</div>
+            </div>
+        </div>
+    </div>
+    
+    {% if bookings %}
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Registration ID</th>
+                    <th>Trekker Name</th>
+                    <th>Email Address</th>
+                    <th>Contact details</th>
+                    <th>Booking Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                <tr>
+                    <td><code>#{{ booking.id }}</code></td>
+                    <td class="fw-bold">{{ booking.trekker.name }}</td>
+                    <td>{{ booking.trekker.username }}</td>
+                    <td>{{ booking.trekker.contact_details or 'N/A' }}</td>
+                    <td>{{ booking.booking_date.strftime('%d-%m-%Y %H:%M') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-center py-5 text-muted">
+        <i class="bi bi-people fs-1 text-muted"></i>
+        <p class="mt-2 mb-0">No trekkers have booked this tour yet.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
