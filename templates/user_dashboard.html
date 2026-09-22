@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block title %}Trekker Dashboard{% endblock %}
+
+{% block content %}
+<div class="hero-header">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h1 class="display-6 fw-bold mb-1">Adventure Awaits, {{ current_user.name }}!</h1>
+            <p class="lead mb-0 text-white-70">Find the perfect routes, manage your upcoming trails, and explore your hiking legacy.</p>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            <a href="#available-treks" class="btn btn-light btn-sm rounded-pill py-2 px-3 fw-bold text-success">
+                <i class="bi bi-compass-fill me-1 text-success"></i> Browse Routes
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="glass-card p-4 mb-5" id="available-treks">
+    <h3 class="fw-bold mb-3 text-dark"><i class="bi bi-funnel-fill text-success me-2"></i>Find Your Next Trek</h3>
+    <form action="{{ url_for('main.user_dashboard') }}" method="GET" class="row g-3">
+        <div class="col-md-4">
+            <label for="search" class="form-label small fw-bold text-secondary">Search Trek Name</label>
+            <div class="input-group">
+                <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control form-control-sm" id="search" name="search" value="{{ search_query }}" placeholder="e.g. Valley of Flowers">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <label for="location" class="form-label small fw-bold text-secondary">Location</label>
+            <select class="form-select form-select-sm" id="location" name="location">
+                <option value="">All Locations</option>
+                {% for loc in locations %}
+                    <option value="{{ loc }}" {% if selected_location == loc %}selected{% endif %}>{{ loc }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="difficulty" class="form-label small fw-bold text-secondary">Difficulty</label>
+            <select class="form-select form-select-sm" id="difficulty" name="difficulty">
+                <option value="">All Difficulties</option>
+                <option value="Easy" {% if selected_difficulty == 'Easy' %}selected{% endif %}>Easy</option>
+                <option value="Moderate" {% if selected_difficulty == 'Moderate' %}selected{% endif %}>Moderate</option>
+                <option value="Hard" {% if selected_difficulty == 'Hard' %}selected{% endif %}>Hard</option>
+            </select>
+        </div>
+        <div class="col-md-2 d-flex align-items-end gap-2">
+            <button type="submit" class="btn btn-primary-custom btn-sm w-100 py-2">Filter</button>
+            {% if search_query or selected_location or selected_difficulty %}
+                <a href="{{ url_for('main.user_dashboard') }}" class="btn btn-outline-secondary btn-sm py-2" title="Reset Filters"><i class="bi bi-arrow-counterclockwise"></i></a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<div class="mb-5">
+    <h3 class="fw-bold mb-4 text-dark"><i class="bi bi-grid-fill text-success me-2"></i>Available Expeditions</h3>
+    {% if available_treks %}
+        <div class="row g-4">
+            {% for trek in available_treks %}
+            <div class="col-md-6 col-lg-4">
+                <div class="glass-card h-100 overflow-hidden d-flex flex-column">
+                    <div style="height: 180px; background-image: url('{{ trek.image_url or 'https://wallpaperaccess.com/full/6170749.jpg' }}'); background-size: cover; background-position: center; position: relative;">
+                        <span class="position-absolute top-0 start-0 m-3 badge {% if trek.difficulty == 'Easy' %}bg-success{% elif trek.difficulty == 'Moderate' %}bg-warning text-dark{% else %}bg-danger{% endif %} rounded-pill px-3 py-2">
+                            {{ trek.difficulty }}
+                        </span>
+                        <span class="position-absolute bottom-0 end-0 m-3 badge bg-dark text-white rounded-pill px-3 py-2">
+                            ₹{{ trek.price }}
+                        </span>
+                    </div>
+                    
+                    <div class="p-4 flex-grow-1 d-flex flex-column justify-content-between">
+                        <div>
+                            <h4 class="fw-bold text-dark mb-1">{{ trek.name }}</h4>
+                            <p class="text-muted small mb-3"><i class="bi bi-geo-alt-fill text-success"></i> {{ trek.location }} &bull; <strong>{{ trek.duration }} days</strong></p>
+                            <p class="text-secondary mb-3 small" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                {{ trek.description or 'Embark on this beautiful trail guide with custom sightseeing and high alpine nature views.' }}
+                            </p>
+                        </div>
+                        
+                        <div>
+                            <hr class="my-3">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <span class="small text-secondary">
+                                    <i class="bi bi-people-fill me-1"></i> Available Slots: <strong class="text-success">{{ trek.available_slots }}</strong>
+                                </span>
+                                <span class="small text-secondary">
+                                    <i class="bi bi-person-badge-fill me-1"></i> Guide: {{ trek.guide.name if trek.guide else 'Unassigned' }}
+                                </span>
+                            </div>
+                            <a href="{{ url_for('main.view_trek', trek_id=trek.id) }}" class="btn btn-primary-custom w-100 py-2">
+                                <i class="bi bi-eye-fill me-1"></i> View Details & Book
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="glass-card p-5 text-center text-muted">
+            <i class="bi bi-tree-fill fs-1 text-muted mb-2"></i>
+            <h4 class="fw-bold">No open treks found</h4>
+            <p class="mb-0">Try adjusting your filters or search query to explore other trails.</p>
+        </div>
+    {% endif %}
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="glass-card p-4 h-100">
+            <h4 class="fw-bold mb-4"><i class="bi bi-journal-bookmark-fill text-success me-2"></i>Your Active Bookings</h4>
+            {% set active_bookings = my_bookings|selectattr('status', 'equalto', 'Booked')|list %}
+            
+            {% if active_bookings %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Trek Name</th>
+                                <th>Schedule</th>
+                                <th>Cost</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for booking in active_bookings %}
+                            <tr>
+                                <td>
+                                    <strong>{{ booking.trek.name }}</strong><br>
+                                    <small class="text-muted"><i class="bi bi-geo-alt"></i> {{ booking.trek.location }}</small>
+                                </td>
+                                <td>
+                                    <span class="small">{{ booking.trek.start_date.strftime('%d-%m-%Y') }}</span>
+                                </td>
+                                <td>₹{{ booking.trek.price }}</td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <a href="{{ url_for('main.view_trek', trek_id=booking.trek.id) }}" class="btn btn-outline-success btn-sm rounded-pill">
+                                            <i class="bi bi-eye"></i> Details
+                                        </a>
+                                        <form action="{{ url_for('main.cancel_booking', booking_id=booking.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this booking?');">
+                                            <button type="submit" class="btn btn-danger-custom btn-sm rounded-pill">
+                                                <i class="bi bi-x-circle"></i> Cancel
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-4 text-muted">
+                    <i class="bi bi-calendar-check fs-1 text-muted mb-2"></i>
+                    <p class="mb-0">You have no active trek bookings currently.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="col-lg-5">
+        <div class="glass-card p-4 h-100">
+            <h4 class="fw-bold mb-4"><i class="bi bi-clock-history text-success me-2"></i>Trekking History</h4>
+            {% set history_bookings = my_bookings|rejectattr('status', 'equalto', 'Booked')|list %}
+            
+            {% if history_bookings %}
+                <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Trek Name</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for booking in history_bookings %}
+                            <tr>
+                                <td>
+                                    <strong>{{ booking.trek.name }}</strong>
+                                </td>
+                                <td>
+                                    <span class="small">{{ booking.booking_date.strftime('%d-%m-%Y') }}</span>
+                                </td>
+                                <td>
+                                    {% if booking.status == 'Cancelled' %}
+                                        <span class="badge badge-status badge-closed">Cancelled</span>
+                                    {% else %}
+                                        <span class="badge badge-status badge-completed">Completed</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-4 text-muted">
+                    <i class="bi bi-hourglass-bottom fs-1 text-muted mb-2"></i>
+                    <p class="mb-0">No historical trekking transactions found.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
